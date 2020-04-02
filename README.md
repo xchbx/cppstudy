@@ -20,7 +20,6 @@ private:
 	Date theBirthDate;
 	Address theAddress;
 };
-
 ···
 而使用这样的写法，很可能会导致文件包含的问题，比如Date类，Address类的头文件包含，同时当改变了Person类所依赖的某个类时，会导致Person类重新编译。这样写也没有做到class的接口与实现分离。因此有两种方法可以实现所谓的接口与实现分离，让逻辑更清晰。
 
@@ -91,10 +90,11 @@ int main(){
 	showInfo<Person>(p);
 	return 0;
 }
-
 ···
+
 方法二：Interface Classes
 将Person类定义为内含纯虚函数的类，纯虚函数即是Person类提供的接口。
+
 ···
 using Date = std::string;//仅供示例，因此不实现Date类了
 using Address = std::string;
@@ -133,8 +133,8 @@ int main()
 {
 	std::shared_ptr<Person> pp = Person::create("Jack", "10/09/2010", "NewYork");
 }
-
 ···
+
 总结
 来自《Effective C++》的三个设计策略：
 
