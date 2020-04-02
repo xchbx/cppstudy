@@ -5,7 +5,7 @@ cppstudy
 
 问题
 通常我们会在一个类的定义中同时写出声明式和定义式，如
-···cpp
+```cpp
 class Person {
 public:
 	Person(const std::string &name, const Date& birthday, const Address& addr);
@@ -19,7 +19,7 @@ private:
 	Date theBirthDate;
 	Address theAddress;
 };
-···
+```
 而使用这样的写法，很可能会导致文件包含的问题，比如Date类，Address类的头文件包含，同时当改变了Person类所依赖的某个类时，会导致Person类重新编译。这样写也没有做到class的接口与实现分离。因此有两种方法可以实现所谓的接口与实现分离，让逻辑更清晰。
 
 方法一：“pimpl idiom”
