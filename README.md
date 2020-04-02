@@ -5,11 +5,10 @@ cppstudy
 
 问题
 通常我们会在一个类的定义中同时写出声明式和定义式，如
-···
+···cpp
 class Person {
 public:
 	Person(const std::string &name, const Date& birthday, const Address& addr);
-	
 	std::string name() const;
 	std::string birthDate() const;
 	std::string address() const;
