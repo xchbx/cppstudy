@@ -1,0 +1,22 @@
+5.6.  Single NAL Unit Packet
+   The single NAL unit packet defined here MUST contain only one NAL
+   unit, of the types defined in [1].  This means that neither an
+   aggregation packet nor a fragmentation unit can be used within a
+   single NAL unit packet.  A NAL unit stream composed by decapsulating
+   single NAL unit packets in RTP sequence number order MUST conform to
+   the NAL unit decoding order.  The structure of the single NAL unit
+   packet is shown in Figure 2.
+      Informative note: The first byte of a NAL unit co-serves as the
+      RTP payload header.
+       0                   1                   2                   3
+       0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+      +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+      |F|NRI|  type   |                                               |
+      +-+-+-+-+-+-+-+-+                                               |
+      |                                                               |
+      |               Bytes 2..n of a Single NAL unit                 |
+      |                                                               |
+      |                               +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+      |                               :...OPTIONAL RTP padding        |
+      +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+      Figure 2.  RTP payload format for single NAL unit packet
