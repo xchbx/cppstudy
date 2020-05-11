@@ -1,7 +1,10 @@
 #ifndef TCPCONNECTOR_H
 #define TCPCONNECTOR_H
 
-#include <WinSock2.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+
 class TcpStream;
 class TcpConnector
 {

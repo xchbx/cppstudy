@@ -13,8 +13,7 @@ UdpDatagram::UdpDatagram()
 
 UdpDatagram::~UdpDatagram()
 {
-    if(m_sd > 0)
-        closesocket(m_sd);
+	closeSocket();
 }
 
 int UdpDatagram::readDatagram(char *buffer, int len)
@@ -22,10 +21,10 @@ int UdpDatagram::readDatagram(char *buffer, int len)
     //receiveing...
     int ByteReceived;
     sockaddr_in SenderAddr;
-    int SenderAddrSize = sizeof(SenderAddr);
+	socklen_t SenderAddrSize = sizeof(SenderAddr);
 
     ByteReceived = recvfrom(m_sd, buffer, len,
-                            0, (SOCKADDR *)&SenderAddr, &SenderAddrSize);
+                            0, (struct sockaddr*)&SenderAddr, &SenderAddrSize);
 
     m_peerIP = inet_ntoa(SenderAddr.sin_addr);
     m_peerPort = ntohs(SenderAddr.sin_port);
@@ -41,7 +40,7 @@ int UdpDatagram::writeDatagram(const char *buffer, int len, char *addr, uint16_t
     address.sin_port = htons(port);
     address.sin_addr.s_addr = inet_addr(addr);
 
-    byteSent = sendto(m_sd, buffer, len, 0, (SOCKADDR*)&address, sizeof(address));
+    byteSent = sendto(m_sd, buffer, len, 0, (struct sockaddr*)&address, sizeof(address));
 
     return byteSent;
 }
@@ -97,10 +96,10 @@ int UdpDatagram::peerPort()
     return m_peerPort;
 }
 
-void UdpDatagram::close()
+void UdpDatagram::closeSocket()
 {
     if(m_sd > 0)
-        closesocket(m_sd);
+        close(m_sd);
 }
 
 int UdpDatagram::recvTimeoutUdp(long sec)
@@ -108,7 +107,7 @@ int UdpDatagram::recvTimeoutUdp(long sec)
     struct timeval timeout;
     timeout.tv_sec = sec;
 
-    struct fd_set fds;
+    fd_set fds;
 
     FD_ZERO(&fds);
     FD_SET(m_sd, &fds);

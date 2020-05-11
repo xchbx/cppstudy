@@ -1,8 +1,14 @@
 #ifndef TCPSTREAM_H
 #define TCPSTREAM_H
 
-#include <WinSock2.h>
+#include <stdio.h>
+#include <unistd.h>
+#include <string.h>
+#include <stdlib.h>
 #include <string>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
 
 class TcpStream
 {
@@ -23,8 +29,8 @@ public:
 
     size_t receiveFrom(char *buffer, size_t len);
     size_t sendTo(char *buffer, size_t len);
-    void close();
-    void disconnecte();
+    void closeSocket();
+    void disconnected();
 
     std::string peerIp();
     int peerPort();

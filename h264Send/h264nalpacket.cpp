@@ -106,7 +106,7 @@ int H264NalPacket::NalSize()
 
 void H264NalPacket::print_nal_unit_type()
 {
-    fprintf(stderr, "Type:%s\t Size:%d", nal_unit_type_description_h264[nal_unit_type], NumBytesinNALUnit);
+    fprintf(stderr, "Type:%s\t Size:%d \r\n", nal_unit_type_description_h264[nal_unit_type], NumBytesinNALUnit);
 }
 
 uint8_t *H264NalPacket::rbsp()

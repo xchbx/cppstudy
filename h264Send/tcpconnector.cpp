@@ -13,7 +13,7 @@ TcpStream *TcpConnector::connectToHost(int port, const char *host)
 
     //connecting...
     int sd = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
-    if(connect(sd, (SOCKADDR*)&address, sizeof(address))!= 0)
+    if(connect(sd, (struct sockaddr*)&address, sizeof(address))!= 0)
         return NULL;
     return new TcpStream(sd, &address);
 }

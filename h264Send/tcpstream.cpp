@@ -1,4 +1,9 @@
 #include "tcpstream.h"
+#include <stdio.h>
+#include <unistd.h>
+#include <string.h>
+#include <stdlib.h>
+
 
 TcpStream::TcpStream(int sd, struct sockaddr_in* addr)
     :m_sd(sd)
@@ -16,7 +21,7 @@ TcpStream::TcpStream(const TcpStream &stream)
 
 TcpStream::~TcpStream()
 {
-    closesocket(m_sd);
+	closeSocket();
 }
 
 size_t TcpStream::receiveFrom(char *buffer, size_t len)
@@ -31,18 +36,18 @@ size_t TcpStream::sendTo(char *buffer, size_t len)
     return send(m_sd, buffer, len, 0);
 }
 
-void TcpStream::close()
+void TcpStream::closeSocket()
 {
     //unsafe Closing...
     if(m_sd > 0)
-        closesocket(m_sd);
+        close(m_sd);
 }
 
-void TcpStream::disconnecte()
+void TcpStream::disconnected()
 {
     //safe Closing...
     if(m_sd > 0)
-        shutdown(m_sd, SD_BOTH);
+        shutdown(m_sd, SHUT_RDWR);
 }
 
 std::string TcpStream::peerIp()

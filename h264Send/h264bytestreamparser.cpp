@@ -15,7 +15,7 @@ H264ByteStreamParser::H264ByteStreamParser(char* filename)
     h264file = NULL;
     h264file = OpenInputFile(filePath);
     if(!h264file)
-        fprintf(stderr, "H264ByteStreamParser: Error in Opening file\n");
+        fprintf(stderr, "H264ByteStreamParser: Error in Opening file:%s\n",filePath);
 }
 
 H264ByteStreamParser::~H264ByteStreamParser()

@@ -1,5 +1,13 @@
 #include "tcpacceptor.h"
 #include "tcpstream.h"
+#include <stdio.h>
+#include <unistd.h>
+#include <string.h>
+#include <stdlib.h>
+#include <arpa/inet.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+
 
 TcpAcceptor::TcpAcceptor(int port, const char* address)
     :m_lsd(0), m_port(port), m_listening(false)
@@ -10,7 +18,7 @@ TcpAcceptor::TcpAcceptor(int port, const char* address)
 TcpAcceptor::~TcpAcceptor()
 {
     if(m_lsd > 0)
-        closesocket(m_lsd);
+        close(m_lsd);
 }
 
 TcpStream *TcpAcceptor::acceptConnection()
@@ -21,9 +29,9 @@ TcpStream *TcpAcceptor::acceptConnection()
     struct sockaddr_in address;
     memset(&address, 0, sizeof(address));
 
-    int len = sizeof(address);
+	socklen_t len = sizeof(address);
 
-    int sd = accept(m_lsd, (SOCKADDR*)&address, &len);
+    int sd = accept(m_lsd, (struct sockaddr*)&address, &len);
     if(sd < 0)
     {
         perror("Accept falied");
@@ -68,7 +76,7 @@ int TcpAcceptor::start()
     else
         address.sin_addr.s_addr = htonl(INADDR_ANY);
 
-    int result = bind(m_lsd, (SOCKADDR*)&address, sizeof(address));
+    int result = bind(m_lsd, (struct sockaddr*)&address, sizeof(address));
     if(result != 0)
     {
         perror("bind() failed");
@@ -82,8 +90,7 @@ int TcpAcceptor::start()
         perror("listen() failed");
         return result;
     }
-    printf("Server: Listening on: %ld %s\n", ntohs(address.sin_port)
-           , inet_ntoa(address.sin_addr));
+    printf("Server: Listening on: %d %s\n", ntohs(address.sin_port), inet_ntoa(address.sin_addr));
     return result;
 }
 
@@ -92,7 +99,7 @@ int TcpAcceptor::recvTimeoutTcp(long sec)
     struct timeval timeout;
     timeout.tv_sec = sec;
 
-    struct fd_set fds;
+	fd_set fds;
 
     FD_ZERO(&fds);
     FD_SET(m_lsd, &fds);

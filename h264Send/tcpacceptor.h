@@ -2,7 +2,6 @@
 #define TCPACCEPTOR_H
 
 #include <string>
-#include <WinSock2.h>
 class TcpStream;
 class TcpAcceptor
 {

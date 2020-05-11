@@ -1,8 +1,15 @@
 #ifndef UDPDATAGRAM_H
 #define UDPDATAGRAM_H
 
+#include <stdio.h>
+#include <unistd.h>
+#include <string.h>
+#include <stdlib.h>
 #include <string>
-#include "stdint.h"
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+
 class UdpDatagram
 {
 public:
@@ -15,7 +22,7 @@ public:
     bool wait(long sec = 0);
     std::string peerIP();
     int peerPort();
-    void close();
+    void closeSocket();
 
 private:
     int         m_sd;

@@ -1,6 +1,10 @@
 #include "h264rtppacketizer.h"
 #include "h264nalpacket.h"
 #include "h264types.h"
+#include <netinet/in.h>
+#include <unistd.h> 
+
+
 
 #define frameRate 25
 
@@ -44,8 +48,8 @@ void H264RtpPacketizer::start(H264ByteStreamParser parser)
         if(nalu_len < 1)
             continue;
         m_timestamp += m_clock/frameRate; /* 90000 / 25 = 3600 */
-#ifdef _DEBUG
-        fprintf(stderr, "\t #%d\n", fNum);
+#if 1
+        fprintf(stderr, "\t Frame Number#%d\n", fNum);
 #endif
 
         if(nalu_len <= H264RtpPacketizer::RTP_PAYLOAD_MAX_SIZE)
@@ -250,8 +254,8 @@ void H264RtpPacketizer::send(uint8_t *sendbuff, int send_len)
 {
     int ret;
     ret = m_socket.writeDatagram((char *)sendbuff, send_len, m_destaddr, m_destport);
-    printf("ret:%d\n", ret);
-    Sleep(36);
+    printf("H264RtpPacketizer::send ret:%d [send_len=%d]\n", ret,send_len);
+    usleep(36*1000);
     if(ret < 0)
         fprintf(stderr, "H264RtpPacketizer: Error in sending udp datagram!\n");
 }
