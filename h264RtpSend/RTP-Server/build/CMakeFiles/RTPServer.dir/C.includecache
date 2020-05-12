@@ -1,0 +1,38 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/happy/work/cppstudy/h264RtpSend/RTP-Server/Network.h
+sys/socket.h
+-
+netinet/in.h
+-
+arpa/inet.h
+-
+
+/home/happy/work/cppstudy/h264RtpSend/RTP-Server/RTPEnc.h
+Network.h
+/home/happy/work/cppstudy/h264RtpSend/RTP-Server/Network.h
+
+/home/happy/work/cppstudy/h264RtpSend/RTP-Server/Utils.h
+stdint.h
+-
+
+/home/happy/work/cppstudy/h264RtpSend/RTP-Server/main.c
+stdio.h
+-
+string.h
+-
+stdlib.h
+-
+Utils.h
+/home/happy/work/cppstudy/h264RtpSend/RTP-Server/Utils.h
+RTPEnc.h
+/home/happy/work/cppstudy/h264RtpSend/RTP-Server/RTPEnc.h
+Network.h
+/home/happy/work/cppstudy/h264RtpSend/RTP-Server/Network.h
+

@@ -1,0 +1,1 @@
+/usr/bin/cc    CMakeFiles/RTPServer.dir/main.c.o CMakeFiles/RTPServer.dir/RTPEnc.c.o CMakeFiles/RTPServer.dir/Utils.c.o CMakeFiles/RTPServer.dir/AVC.c.o CMakeFiles/RTPServer.dir/Network.c.o  -o RTPServer 
