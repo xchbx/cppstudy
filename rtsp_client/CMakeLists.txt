@@ -1,0 +1,10 @@
+project(Rtsp-Client)
+
+set(CMAKE_C_STANDARD 99)
+set(CMAKE_CXX_STANDARD 11)
+
+set(SRC RtspPlayer.cpp sdp.c test.cpp)
+
+add_executable(rtsp_client ${SRC})
+TARGET_LINK_LIBRARIES(rtsp_client
+                         pthread)
