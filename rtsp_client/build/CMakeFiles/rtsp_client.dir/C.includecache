@@ -1,0 +1,26 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/happy/work/cppstudy/rtsp_client/sdp.c
+stdlib.h
+-
+string.h
+-
+strings.h
+-
+stdio.h
+-
+stdarg.h
+-
+sdp.h
+/home/happy/work/cppstudy/rtsp_client/sdp.h
+
+/home/happy/work/cppstudy/rtsp_client/sdp.h
+time.h
+-
+

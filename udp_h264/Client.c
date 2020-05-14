@@ -1,9 +1,9 @@
-#include <memory.h> 
+#include <memory.h>
 #include <net/if.h>
 #include <netinet/in.h>
 #include <sys/types.h>
 #include <sys/socket.h>
-#include "h264.h" 
+#include "h264.h"
 #include <arpa/inet.h>
 #include <sys/time.h>
 #include <time.h>
@@ -15,20 +15,17 @@
 
 void print_time ()
 {
-	struct timeval tv;
-	struct tm* ptm;
-	char time_string[40];
-	long milliseconds;
+    struct timeval tv;
+    struct tm* ptm;
+    char time_string[40];
+    long milliseconds;
 
-	/* 获得日期时间，并转化为 struct tm。 */
-	gettimeofday (&tv, NULL);
-	ptm = localtime (&tv.tv_sec);
-	/* 格式化日期和时间，精确到秒为单位。*/
-	strftime (time_string, sizeof (time_string), "%Y-%m-%d %H:%M:%S", ptm);
-	/* 从微秒计算毫秒。*/
-	milliseconds = tv.tv_usec / 1000;
-  	/* 以秒为单位打印格式化后的时间日期，小数点后为毫秒。*/
-	printf ("%s.%03ld\n", time_string, milliseconds);
+    gettimeofday (&tv, NULL);
+    ptm = localtime (&tv.tv_sec);
+    strftime (time_string, sizeof (time_string), "%Y-%m-%d %H:%M:%S", ptm);
+    milliseconds = tv.tv_usec / 1000;
+
+    printf ("%s.%03ld\n", time_string, milliseconds);
 }
 
 int rtpnum = 0;
@@ -49,7 +46,7 @@ void decode_rtp2h264(unsigned char *rtp_buf, int len, FILE *savefp)
         if (fu_header->E == 1) { /* end of fu-a */
             fwrite(&rtp_buf[14], 1, len - 14, savefp);
 
-            printf("%3d, len: %6d  ",rtpnum++, nalu_len + 1);  
+            printf("%3d, len: %6d  ",rtpnum++, nalu_len + 1);
             printf("nal_unit_type: %x\n", h264_nal_header & 0x1f);
             nalu_len = 0;
         } else if (fu_header->S == 1) { /* start of fu-a */
@@ -60,7 +57,7 @@ void decode_rtp2h264(unsigned char *rtp_buf, int len, FILE *savefp)
             fputc(0, savefp);
             fputc(0, savefp);
             fputc(1, savefp);
-            h264_nal_header = (fu_header->TYPE & 0x1f) 
+            h264_nal_header = (fu_header->TYPE & 0x1f)
                 | (nalu_header->NRI << 5)
                 | (nalu_header->F << 7);
             fputc(h264_nal_header, savefp);
@@ -75,11 +72,11 @@ void decode_rtp2h264(unsigned char *rtp_buf, int len, FILE *savefp)
         fputc(0, savefp);
         fputc(0, savefp);
         fputc(0, savefp);
-        fputc(1, savefp); 
-        h264_nal_header = (nalu_header->TYPE & 0x1f) 
+        fputc(1, savefp);
+        h264_nal_header = (nalu_header->TYPE & 0x1f)
             | (nalu_header->NRI << 5)
             | (nalu_header->F << 7);
-        
+
         printf("%3d, len: %6d  ",rtpnum++, len - 12);
         printf("nal_unit_type: %x\n", h264_nal_header & 0x1f);
 
@@ -112,12 +109,11 @@ int main(int argc, char **argv)
     unsigned char buf[RECEIVE_BUF_SIZE];
 
     if (argc != 4) {
-        fprintf(stderr, "usage: %s save_filename [server_IP] [recv_port]\n", 
+        fprintf(stderr, "usage: %s save_filename [server_IP] [recv_port]\n",
                 argv[0]);
         exit(0);
     }
 
-    //H264输出文件
     save_file_fd = fopen(argv[1], "wb");
     if (!save_file_fd) {
         perror("fopen");
@@ -142,25 +138,22 @@ int main(int argc, char **argv)
     if(connect(socket_s, (struct sockaddr*)&si_me,sizeof(si_me)) == -1)
     {
         printf("connect error.\n");
-            exit(1);
+        exit(1);
     }
 
     send(socket_s,"connect", 7, 0);
-/**TEST
- * 
-    ret=recv(socket_s, 
-            buf,
-            sizeof(buf),
-            0);
-    buf[ret]='\0';
-    printf("recv %s\n",buf);
-*/
+    /**TEST
+     *
+     ret=recv(socket_s,
+     buf,
+     sizeof(buf),
+     0);
+     buf[ret]='\0';
+     printf("recv %s\n",buf);
+     */
     while(1)
     {
-        ret = recv(socket_s, 
-                    buf,
-                    sizeof(buf),
-                    0);
+        ret = recv(socket_s,buf,sizeof(buf),0);
         if (ret < 0) {
             fprintf(stderr, "recv fail\n");
             continue;
