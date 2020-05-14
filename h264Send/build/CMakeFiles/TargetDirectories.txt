@@ -1,3 +1,0 @@
-/home/happy/work/cppstudy/h264Send/build/CMakeFiles/rebuild_cache.dir
-/home/happy/work/cppstudy/h264Send/build/CMakeFiles/h264Send.dir
-/home/happy/work/cppstudy/h264Send/build/CMakeFiles/edit_cache.dir
