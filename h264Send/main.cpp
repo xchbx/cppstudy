@@ -15,7 +15,7 @@ int main()
 
 	H264RtpPacketizer p;
 	p.set_clock_frequency(9000);
-	p.set_destination_addr((char*)"172.19.0.222", 1234);
+	p.set_destination_addr((char*)"172.19.0.222", 7788);
 	p.start(parser);
 
     return 0;

@@ -91,6 +91,7 @@ void FreeNALU(NALU_t *n)
             n->buf=NULL;
         }
         free (n);
+		n = NULL;
     }
 }
 
@@ -209,14 +210,14 @@ int rtpnum = 0;
 
 void debug(NALU_t *nFrame)
 {
-    if (!n)return;
+    if (!nFrame)return;
     printf("%3d, len: %6d  ",rtpnum++, nFrame->len);
     printf("nal_unit_type: %x\n", nFrame->nal_unit_type);
 }
+
 struct sockaddr_in serveraddr, clientaddr;
 socklen_t addr_len;
 int sockfd;
-//int sin_size;
 
 //usage: %s <H264_filename> [port]
 int main(int argc, char* argv[])
@@ -286,11 +287,11 @@ int main(int argc, char* argv[])
             isCircle--;
             while(!feof(h264Bitsream))
             {
-                GetAnnexbNALU(n);
-                dump(n);
+                GetAnnexbNALU(nFrame);
+                //dump(nFrame);
 
                 ts_current+=timestamp_increse;
-                if(n->len <= UDP_MAX_SIZE){
+                if(nFrame->len <= UDP_MAX_SIZE){
                     memset(sendbuf,0,SEND_BUF_SIZE);
                     rtp_hdr =(RTP_FIXED_HEADER *)&sendbuf[0];
                     rtp_hdr->csrc_len = 0;
@@ -304,14 +305,14 @@ int main(int argc, char* argv[])
                     rtp_hdr->ssrc = htonl(SSRC_NUM);
 
                     nalu_hdr =(NALU_HEADER *)&sendbuf[12];
-                    nalu_hdr->F = (n->forbidden_bit) >> 7;
-                    nalu_hdr->NRI = (n->nal_reference_idc) >> 5;
-                    nalu_hdr->TYPE = n->nal_unit_type;
-                    //printf("%d %d\n",nalu_hdr->TYPE,n->nal_unit_type);
+                    nalu_hdr->F = (nFrame->forbidden_bit) >> 7;
+                    nalu_hdr->NRI = (nFrame->nal_reference_idc) >> 5;
+                    nalu_hdr->TYPE = nFrame->nal_unit_type;
+                    //printf("%d %d\n",nalu_hdr->TYPE,nFrame->nal_unit_type);
 
                     nalu_payload=&sendbuf[13];
-                    memcpy(nalu_payload,n->buf+1,n->len-1);
-                    bytes=n->len + 12;
+                    memcpy(nalu_payload,nFrame->buf+1,nFrame->len-1);
+                    bytes=nFrame->len + 12;
                     //printf("%3d, len: %6d  ",rtpnum++, bytes);
                     printf("%3d   ",rtpnum-1);
                     print_time();
@@ -333,11 +334,11 @@ int main(int argc, char* argv[])
                     rtp_hdr->ssrc    = htonl(SSRC_NUM);
 
 
-                    int packetNum = n->len/UDP_MAX_SIZE;
-                    if (n->len%UDP_MAX_SIZE != 0)
+                    int packetNum = nFrame->len/UDP_MAX_SIZE;
+                    if (nFrame->len%UDP_MAX_SIZE != 0)
                         packetNum ++;
 
-                    int lastPackSize = n->len - (packetNum-1)*UDP_MAX_SIZE;
+                    int lastPackSize = nFrame->len - (packetNum-1)*UDP_MAX_SIZE;
                     int packetIndex = 1;
 
 
@@ -348,10 +349,10 @@ int main(int argc, char* argv[])
                     fu_hdr->S=1;
                     fu_hdr->E=0;
                     fu_hdr->R=0;
-                    fu_hdr->TYPE=n->nal_unit_type;
+                    fu_hdr->TYPE=nFrame->nal_unit_type;
 
                     nalu_payload=&sendbuf[14];
-                    memcpy(nalu_payload,n->buf+1,UDP_MAX_SIZE-1);
+                    memcpy(nalu_payload,nFrame->buf+1,UDP_MAX_SIZE-1);
                     bytes=UDP_MAX_SIZE-1+14;
 
                     //printf("%3d, len: %6d  ",rtpnum++, bytes);
@@ -378,18 +379,18 @@ int main(int argc, char* argv[])
 
 
                         fu_ind =(FU_INDICATOR*)&sendbuf[12];
-                        fu_ind->F=n->forbidden_bit>>7;
-                        fu_ind->NRI=n->nal_reference_idc>>5;
+                        fu_ind->F=nFrame->forbidden_bit>>7;
+                        fu_ind->NRI=nFrame->nal_reference_idc>>5;
                         fu_ind->TYPE=28;
 
                         fu_hdr =(FU_HEADER*)&sendbuf[13];
                         fu_hdr->S=0;
                         fu_hdr->E=0;
                         fu_hdr->R=0;
-                        fu_hdr->TYPE=n->nal_unit_type;
+                        fu_hdr->TYPE=nFrame->nal_unit_type;
 
                         nalu_payload=&sendbuf[14];
-                        memcpy(nalu_payload,n->buf+(packetIndex-1)*UDP_MAX_SIZE,UDP_MAX_SIZE);
+                        memcpy(nalu_payload,nFrame->buf+(packetIndex-1)*UDP_MAX_SIZE,UDP_MAX_SIZE);
                         bytes=UDP_MAX_SIZE+14;
 
                         //printf("%3d, len: %6d  ",rtpnum++, bytes);
@@ -411,18 +412,18 @@ int main(int argc, char* argv[])
                     rtp_hdr->ssrc    = htonl(SSRC_NUM);
 
                     fu_ind =(FU_INDICATOR*)&sendbuf[12];
-                    fu_ind->F=n->forbidden_bit>>7;
-                    fu_ind->NRI=n->nal_reference_idc>>5;
+                    fu_ind->F=nFrame->forbidden_bit>>7;
+                    fu_ind->NRI=nFrame->nal_reference_idc>>5;
                     fu_ind->TYPE=28;
 
                     fu_hdr =(FU_HEADER*)&sendbuf[13];
                     fu_hdr->S=0;
                     fu_hdr->E=1;
                     fu_hdr->R=0;
-                    fu_hdr->TYPE=n->nal_unit_type;
+                    fu_hdr->TYPE=nFrame->nal_unit_type;
 
                     nalu_payload=&sendbuf[14];
-                    memcpy(nalu_payload,n->buf+(packetIndex-1)*UDP_MAX_SIZE,lastPackSize);
+                    memcpy(nalu_payload,nFrame->buf+(packetIndex-1)*UDP_MAX_SIZE,lastPackSize);
                     bytes=lastPackSize+14;
 
                     sendto(sockfd, sendbuf, bytes, 0, (struct sockaddr*)&clientaddr, addr_len);
@@ -444,7 +445,7 @@ int main(int argc, char* argv[])
         printf("-------------------\n");
     }
 
-    FreeNALU(n);
+    FreeNALU(nFrame);
     close(sockfd);
     return 0;
 }

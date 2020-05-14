@@ -103,8 +103,10 @@ int main(int argc, char **argv)
 {
     FILE *save_file_fd;
     unsigned short port;
-    int socket_s = -1;
-    struct sockaddr_in si_me;
+    int soketFd= -1;
+	unsigned int addr_length;
+	struct sockaddr_in serveraddr;
+	
     int ret;
     unsigned char buf[RECEIVE_BUF_SIZE];
 
@@ -124,46 +126,32 @@ int main(int argc, char **argv)
     port = atoi(argv[3]);
 
     //init socket
-    socket_s = socket(AF_INET, SOCK_DGRAM, 0);
-    if (socket_s < 0) {
+    soketFd = socket(AF_INET, SOCK_DGRAM, 0);
+    if (soketFd < 0) {
         printf("socket fail!\n");
         exit(1);
     }
 
-    bzero(&si_me, sizeof(si_me));
-    si_me.sin_family = AF_INET;
-    si_me.sin_port = htons(port);
-    si_me.sin_addr.s_addr = inet_addr(serverIP);
+    bzero(&serveraddr, sizeof(serveraddr));
+    serveraddr.sin_family = AF_INET;
+    serveraddr.sin_port = htons(port);
+    serveraddr.sin_addr.s_addr = inet_addr(serverIP);
+	addr_length = sizeof(serveraddr);
 
-    if(connect(socket_s, (struct sockaddr*)&si_me,sizeof(si_me)) == -1)
-    {
-        printf("connect error.\n");
-        exit(1);
-    }
-
-    send(socket_s,"connect", 7, 0);
-    /**TEST
-     *
-     ret=recv(socket_s,
-     buf,
-     sizeof(buf),
-     0);
-     buf[ret]='\0';
-     printf("recv %s\n",buf);
-     */
     while(1)
     {
-        ret = recv(socket_s,buf,sizeof(buf),0);
-        if (ret < 0) {
+		int recv_length = 0;
+		recv_length = recvfrom(soketFd, buf, sizeof(buf), 0, (struct sockaddr *) &serveraddr, &addr_length);
+        if (recv_length < 0) {
             fprintf(stderr, "recv fail\n");
             continue;
         }
-        //show_buf(buf,ret);
+		 fprintf(stderr, "recv recv_length = %d\n",recv_length);
         decode_rtp2h264(buf, ret, save_file_fd);
     } /* wile (1) */
 
     fclose(save_file_fd);
-    close(socket_s);
+    close(soketFd);
 
     return 0;
 }

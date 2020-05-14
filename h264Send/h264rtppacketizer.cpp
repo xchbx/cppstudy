@@ -48,7 +48,7 @@ void H264RtpPacketizer::start(H264ByteStreamParser parser)
         if(nalu_len < 1)
             continue;
         m_timestamp += m_clock/frameRate; /* 90000 / 25 = 3600 */
-#if 1
+#ifdef _DEBUG
         fprintf(stderr, "\t Frame Number#%d\n", fNum);
 #endif
 
@@ -58,28 +58,28 @@ void H264RtpPacketizer::start(H264ByteStreamParser parser)
             memset(send_buff, 0, H264RtpPacketizer::SEND_BUFF_SIZE);
 
             /* Copied from http://tools.ietf.org/html/rfc3550#section-5
+            
+	           Schulzrinne, et al.         Standards Track                    [Page 12]
+	           FFC 3550                          RTP                          July 2003
+	         5. RTP Data Transfer Protocol
 
-                   Schulzrinne, et al.         Standards Track                    [Page 12]
-                   FFC 3550                          RTP                          July 2003
-                 5. RTP Data Transfer Protocol
+	         5.1 RTP Fixed Header Fields
 
-                 5.1 RTP Fixed Header Fields
+	           The RTP header has the following format:
 
-                   The RTP header has the following format:
-
-                    0                   1                   2                   3
-                    0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
-                   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-                   |V=2|P|X|  CC   |M|     PT      |       sequence number         |
-                   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-                   |                           timestamp                           |
-                   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-                   |           synchronization source (SSRC) identifier            |
-                   +=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+
-                   |            contributing source (CSRC) identifiers             |
-                   |                             ....                              |
-                   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-                 */
+	            0                   1                   2                   3
+	            0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+	           +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+	           |V=2|P|X|  CC   |M|     PT      |       sequence number         |
+	           +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+	           |                           timestamp                           |
+	           +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+	           |           synchronization source (SSRC) identifier            |
+	           +=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+
+	           |            contributing source (CSRC) identifiers             |
+	           |                             ....                              |
+	           +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+	         */
             rtp_hdr = (rtp_header_t *)send_buff;
             rtp_hdr->csrc_len       = 0;
             rtp_hdr->extension      = 0;
@@ -92,16 +92,16 @@ void H264RtpPacketizer::start(H264ByteStreamParser parser)
             rtp_hdr->timestamp      = htonl(m_timestamp);
 
             /*
-                         * 2. rtp single nal unit
-                         */
+             * 2. rtp single nal unit
+             */
             nalu_hdr        = (nalu_header_t *)&send_buff[12];
             nalu_hdr->f     = (nalu_buf[0] & 0X80) >> 7;
             nalu_hdr->nri   = (nalu_buf[0] & 0x60) >> 5;
             nalu_hdr->type  = (nalu_buf[0] & 0x1f);
 
             /*
-                         * 3. nal
-                         */
+             * 3. nal
+             */
             memcpy(send_buff + 13, nalu_buf + 1, nalu_len -1);
 
             len_sendbuf = sizeof(rtp_header_t) + nalu_len;
@@ -213,7 +213,7 @@ void H264RtpPacketizer::start(H264ByteStreamParser parser)
                     //The FU header
                     fu_hdr = (fu_header_t *)&send_buff[13];
                     fu_hdr->s    = 0;
-                    fu_hdr->e    = 0;
+                    fu_hdr->e    = 1;
                     fu_hdr->r    = 0;
                     fu_hdr->type = (nalu_buf[0] & 0x1f);
 
@@ -227,6 +227,7 @@ void H264RtpPacketizer::start(H264ByteStreamParser parser)
             }
             delete nal;
         }
+		usleep(36*1000);
     }
 }
 
@@ -255,9 +256,10 @@ void H264RtpPacketizer::send(uint8_t *sendbuff, int send_len)
     int ret;
     ret = m_socket.writeDatagram((char *)sendbuff, send_len, m_destaddr, m_destport);
     printf("H264RtpPacketizer::send ret:%d [send_len=%d]\n", ret,send_len);
-    usleep(36*1000);
     if(ret < 0)
+    {
         fprintf(stderr, "H264RtpPacketizer: Error in sending udp datagram!\n");
+    }
 }
 
 void H264RtpPacketizer::set_destination_addr(char *addr, uint16_t port)
